@@ -1,4 +1,7 @@
 const Product = require('./model');
+const Category = require('../category/model');
+const Tag = require('../tag/model');
+
 const config = require('../config');
 const path = require('path');
 const fs = require('fs');
@@ -8,6 +11,17 @@ const fs = require('fs');
 async function store(req, res, next){
     try {
         let payload = req.body;
+
+        //cek adanya kategori pada payload
+        if(payload.category){
+            let category = await Category.findOne({name: {$regex: payload.category, $options: 'i'}})
+        }
+        if(category){
+            payload = {...payload, category: category._id};
+        }else{
+            //hapus properti
+            delete payload.category;
+        }
         if(req.file){
             //lokasi file sementara yg di upload
             let temp_path = req.file.path;
@@ -100,6 +114,29 @@ async function index(req, res, next) {
 async function update(req, res, next){
     try {
         let payload = req.body;
+
+        //TODO cek adanya field category pada payload
+        if(payload.category){
+            const category = await Category.findOne({name: {$regex: payload.category, $options: 'i'}});
+            // const category = await Category.findOne({name: new RegExp(payload.category,'i')});
+        }
+        if(category){
+            payload = {...payload, category: category._id};
+        }else{
+            delete payload.category;
+        }
+
+        //TODO cek adanya field tags yang memiliki isi (bukan sekedar array kosong)
+        if(payload.tags && payload.tags.length){
+            const tags = await Tag.find({name: {$in: payload.tags}});
+            // const tags = await Tag.find().where('name').in(payload.tags).exec();
+
+            //jika ada resultnya
+            if(tags.length){
+                payload = {...payload, tags: tags.map(tag => tag._id)};
+            }
+        }
+
         if(req.file){
             //lokasi file sementara yg di upload
             let temp_path = req.file.path;
