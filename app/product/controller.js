@@ -12,16 +12,30 @@ async function store(req, res, next){
     try {
         let payload = req.body;
 
-        //cek adanya kategori pada payload
+        //TODO cek adanya field category pada payload
         if(payload.category){
-            let category = await Category.findOne({name: {$regex: payload.category, $options: 'i'}})
+            let category = await Category.findOne({name: {$regex: payload.category, $options: 'i'}});
+            //let category = await Category.findOne({name: new RegExp(payload.category, 'i')})
+            if(category){
+                payload = {...payload, category: category._id};
+            }else{
+                //hapus properti
+                delete payload.category;
+            }
         }
-        if(category){
-            payload = {...payload, category: category._id};
-        }else{
-            //hapus properti
-            delete payload.category;
+
+        //TODO cek adanya field tags yang memiliki isi (bukan sekedar array kosong)
+        if(payload.tags && payload.tags.length){
+            const tags = await Tag.find({name: {$in: payload.tags}});
+            // const tags = await Tag.find().where('name').in(payload.tags).exec();
+
+            //jika ada resultnya
+            if(tags.length){
+                payload = {...payload, tags: tags.map(tag => tag._id)};
+            }
         }
+
+        //TODO cek adanya file yang diupload
         if(req.file){
             //lokasi file sementara yg di upload
             let temp_path = req.file.path;
@@ -100,9 +114,28 @@ async function store(req, res, next){
 async function index(req, res, next) {
     try {
         //limit dan skip dibawah bertipe string, maka harus di parsing
-        let {limit = 10, skip = 0} = req.query;
+        let {limit = 10, skip = 0, q= '', category= '', tags= []} = req.query;
 
-        const products = await Product.find().limit(parseInt(limit)).skip(parseInt(skip));
+        let criteria = {};
+        if(q.length){
+            // criteria = {...criteria, name: {$regex: `${q}`, $options: 'i'}}
+            criteria = {...criteria, name: new RegExp(`${q}`,'i')};
+
+        }
+        if(category.length){
+            //! ingat isi field category pada document product adalah id, bukan nama category
+            category = await Category.findOne({name: new RegExp(category,'i')});
+
+            criteria = {...criteria, category: category._id};
+        }
+
+        if(tags.length){
+            tags = await Tag.find().where('name').in(tags).exec();
+
+            criteria = {...criteria, tags: {$in: tags.map(tag => tag._id)}};
+        }
+
+        const products = await Product.find(criteria).limit(parseInt(limit)).skip(parseInt(skip)).populate('category').populate('tags');
         return res.json(products);
 
     } catch (error) {
@@ -119,11 +152,11 @@ async function update(req, res, next){
         if(payload.category){
             const category = await Category.findOne({name: {$regex: payload.category, $options: 'i'}});
             // const category = await Category.findOne({name: new RegExp(payload.category,'i')});
-        }
-        if(category){
-            payload = {...payload, category: category._id};
-        }else{
-            delete payload.category;
+            if(category){
+                payload = {...payload, category: category._id};
+            }else{
+                delete payload.category;
+            }
         }
 
         //TODO cek adanya field tags yang memiliki isi (bukan sekedar array kosong)
@@ -137,6 +170,7 @@ async function update(req, res, next){
             }
         }
 
+        //TODO cek adanya file image yang diupload
         if(req.file){
             //lokasi file sementara yg di upload
             let temp_path = req.file.path;

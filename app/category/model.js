@@ -10,6 +10,6 @@ let categorySchema = new Schema({
     }
 })
 
-const Category = model('category', categorySchema);
+const Category = model('Category', categorySchema);
 
 module.exports = Category;
