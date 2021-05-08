@@ -51,7 +51,7 @@ userSchema.path('email').validate(function(value){
 userSchema.path('email').validate(async function(value){
 
     try {
-        const count = await this.model('User').count({email: value});
+        const count = await this.model('User').countDocuments({email: value});
 
         //TODO jika ditemukan document / sudah ada, maka akan di return false
         return !count;

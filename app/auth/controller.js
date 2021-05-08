@@ -53,13 +53,13 @@ async function login(req, res, next) {
 
         if(!user) return res.json({error: 1, message: 'email or password incorrect'})
 
-        //buat json web token
+        //TODO buat json web token
         let signed = jwt.sign(user, config.secretKey);
 
-        //simpan token ke user dengan $push ke array token
-        await findOneAndUpdate({_id: user._id}, {$push: {token: signed}}, {new: true});
+        //TODO simpan token ke user dengan $push ke array token
+        await User.findOneAndUpdate({_id: user._id}, {$push: {token: signed}}, {new: true});
 
-        //response ke client
+        //TODO response ke client
         return res.json({
             message:'logged in successfully',
             user: user,

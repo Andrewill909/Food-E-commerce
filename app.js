@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 //TODO: import product router dan router lainya
+const {decodeToken} = require('./app/auth/middleware');
 
 const productRouter = require('./app/product/router');
 const categoryRouter = require('./app/category/router');
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //TODO gunakan product router dan router lainya
 
+app.use(decodeToken());
 app.use('/api', productRouter);
 app.use('/api', categoryRouter);
 app.use('/api', tagRouter);
