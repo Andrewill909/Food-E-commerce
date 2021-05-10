@@ -10,11 +10,12 @@ function decodeToken() {
 
             if(!token) return next();
 
+            //TODO modifikasi req dengan nambahin key user sblm diterusin ke route berikutnya
             req.user = jwt.verify(token, config.secretKey);
 
             let user = await User.findOne({token: {$in: [token]}});
             
-            //token expired (user tdk ditemukan)
+            //! token expired (user tdk ditemukan)
             if(!user){
                 return res.json({
                     error:1,
