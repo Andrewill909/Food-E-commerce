@@ -12,6 +12,11 @@ const categoryRouter = require('./app/category/router');
 const tagRouter = require('./app/tag/router');
 const authRouter = require('./app/auth/router');
 
+const wilayahRouter = require('./app/wilayah/router');
+const deliveryRouter = require('./app/delivery-address/router');
+
+const cartRouter = require('./app/cart/router');
+
 var app = express();
 
 // view engine setup
@@ -32,6 +37,10 @@ app.use('/api', categoryRouter);
 app.use('/api', tagRouter);
 app.use('/auth', authRouter);
 
+app.use('/api', wilayahRouter);
+app.use('/api', deliveryRouter);
+
+app.use('/api', cartRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

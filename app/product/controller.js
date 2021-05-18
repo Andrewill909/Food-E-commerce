@@ -6,10 +6,21 @@ const config = require('../config');
 const path = require('path');
 const fs = require('fs');
 
+const {policyFor} = require('../policy/index');
 
 //function store
 async function store(req, res, next){
     try {
+        //TODO cek policy
+        let policy = policyFor(req.user);
+
+        if(!policy.can('create','Product')){
+            return res.json({
+                error:1,
+                message:'Anda tidak memiliki akses untuk membuat produk'
+            });
+        }
+
         let payload = req.body;
 
         //TODO cek adanya field category pada payload
@@ -135,8 +146,11 @@ async function index(req, res, next) {
             criteria = {...criteria, tags: {$in: tags.map(tag => tag._id)}};
         }
 
+        //* count berisi jumlah semua document utk frontend
+        let count = await Product.find(criteria).countDocuments();
+
         const products = await Product.find(criteria).limit(parseInt(limit)).skip(parseInt(skip)).populate('category').populate('tags');
-        return res.json(products);
+        return res.json({data: products, count});
 
     } catch (error) {
         next(error);
@@ -146,6 +160,17 @@ async function index(req, res, next) {
 //function update
 async function update(req, res, next){
     try {
+
+        //TODO cek policy
+        let policy = policyFor(req.user);
+
+        if(!policy.can('update', 'Product')){
+            return res.json({
+                error:1,
+                message:'Anda tidak memiliki akses untuk mengupdate produk'
+            });
+        }
+
         let payload = req.body;
 
         //TODO cek adanya field category pada payload
@@ -261,6 +286,17 @@ async function update(req, res, next){
 //function delete
 async function destroy(req, res, next) {
     try {
+
+        //TODO cek policy
+        let policy = policyFor(req.user);
+        
+        if(!policy.can('delete', 'Product')){
+            return res.json({
+                error:1,
+                message:'Anda tidak memiliki akses untuk menghapus produk'
+            });
+        }
+
         let product = await Product.findOneAndDelete({_id: req.params.id});
 
         //cek juga apakah produk yang akan dihapus punya file gambar
@@ -276,6 +312,7 @@ async function destroy(req, res, next) {
         next(error)
     }
 }
+
 module.exports = {
     store, index, update, destroy
 }
