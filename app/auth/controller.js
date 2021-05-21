@@ -37,6 +37,7 @@ async function localStrategy(email, password, done) {
 
         if(bcrypt.compareSync(password, user.password)){
 
+            //toJSON utk menghilangkan field yg tdk perlu di consume
             ({password, ...userWithoutPassword} = user.toJSON());
 
             return done(null, userWithoutPassword);
