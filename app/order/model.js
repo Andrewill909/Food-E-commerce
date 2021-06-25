@@ -18,21 +18,21 @@ const orderSchema = new Schema({
     },
 
     delivery_address: {
-        provinsi: {Type: String, required: [true, 'Provinsi harus diisi']},
-        kabupaten: {Type: String, required: [true, 'Kabupaten harus diisi']},
-        kecamatan: {Type: String, required: [true, 'Kecamatan harus diisi']},
-        kelurahan: {Type: String, required: [true, 'Kelurahan harus diisi']},
-        detail: {Type: String}
+        provinsi: {type: String, required: [true, 'Provinsi harus diisi']},
+        kabupaten: {type: String, required: [true, 'Kabupaten harus diisi']},
+        kecamatan: {type: String, required: [true, 'Kecamatan harus diisi']},
+        kelurahan: {type: String, required: [true, 'Kelurahan harus diisi']},
+        detail: {type: String}
     },
 
     user: {
-        Type: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref:'User'
     },
 
     order_items: [
         {
-        Type: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref:'OrderItem'
     }
     ]

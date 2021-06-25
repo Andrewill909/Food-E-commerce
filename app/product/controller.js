@@ -127,10 +127,11 @@ async function index(req, res, next) {
         //limit dan skip dibawah bertipe string, maka harus di parsing
         let {limit = 10, skip = 0, q= '', category= '', tags= []} = req.query;
 
+
         let criteria = {};
         if(q.length){
-            // criteria = {...criteria, name: {$regex: `${q}`, $options: 'i'}}
-            criteria = {...criteria, name: new RegExp(`${q}`,'i')};
+            criteria = {...criteria, name: {$regex: `${q}`, $options: 'i'}}
+            // criteria = {...criteria, name: new RegExp(`${q}`,'i')};
 
         }
         if(category.length){
