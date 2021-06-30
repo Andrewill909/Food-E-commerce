@@ -57,7 +57,7 @@ async function store(req, res, next){
                     ...item,
                     name: item.product.name,
                     qty: parseInt(item.qty),
-                    price: parseInt(item.poduct.price),
+                    price: parseInt(item.product.price),
                     order: order._id,
                     product: item.product._id
                 }

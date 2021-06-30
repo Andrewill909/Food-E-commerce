@@ -29,7 +29,7 @@ const invoiceSchema = new Schema({
     payment_status: {
         type: String,
         enum: ['waiting payment', 'paid'],
-        default: ['waiting_payment']
+        default: 'waiting payment'
     },
 
     user: {
