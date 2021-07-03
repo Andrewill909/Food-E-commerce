@@ -11,5 +11,10 @@ module.exports={
     dbUser: process.env.DB_USER,
     dbPort: process.env.DB_PORT,
     dbPass: process.env.DB_PASS,
-    dbName: process.env.DB_NAME
+    dbName: process.env.DB_NAME,
+    midtrans:{
+        isProduction: process.env.MIDTRANS_IS_PRODUCTION,
+        serverKey: process.env.MIDTRANS_SERVER_KEY,
+        clientKey: process.env.MIDTRANS_CLIENT_KEY
+    }
 }

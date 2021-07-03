@@ -90,7 +90,7 @@ async function store(req, res, next){
 
 async function index(req, res, next){
 
-    let policy = policyFor(req,use);
+    let policy = policyFor(req.user);
 
     if(!policy.can('view', 'Order')){
         return res.json({
@@ -107,7 +107,8 @@ async function index(req, res, next){
         let count = await Order.find({user: req.user._id}).countDocuments();
 
         //mendapatkan order dengan limit dan skip (di sort secara ascending)
-        let orders = await Order.find({user: req.user._id}).limit(parseInt(limit)).skip(parseInt(skip)).sort('-createdAt');
+        let orders = await Order.find({user: req.user._id}).populate({path: 'order_items', model: 'OrderItem', populate: {path: 'product', model: 'Product'}})
+        .limit(parseInt(limit)).skip(parseInt(skip)).sort('-createdAt');
 
         //perlu ditambahkan {virtuals: true} pada toJSON agar field virtual dianggap
         return res.json({
