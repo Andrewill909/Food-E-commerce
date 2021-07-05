@@ -4,15 +4,17 @@ const { policyFor } = require("../policy/index");
 const midtransClient = require("midtrans-client");
 const config = require("../config");
 const Order = require("../order/model");
+const axios = require('axios');
+
 
 //key
-let serverK = config.midtrans.serverKey+':';
-let based64 = Buffer.from(serverK).toString('base64');
-console.log(based64);
+// let serverK = config.midtrans.serverKey+':';
+// let based64 = Buffer.from(serverK).toString('base64');
+// console.log(based64);
 
 let snap = new midtransClient.Snap({
   isProduction: config.midtrans.isProduction,
-  serverKey: `Basic ${based64}`,
+  serverKey: config.midtrans.serverKey,
   clientKey: config.midtrans.clientKey,
 });
 
@@ -43,7 +45,7 @@ async function show(req, res, next) {
 
 async function initiatePayment(req, res) {
   try {
-      console.log(based64);
+
     let { order_id } = req.params;
     //get invoice
     let invoice = await Invoice.findOne({ order: order_id }).populate("user").populate("order");
@@ -71,9 +73,22 @@ async function initiatePayment(req, res) {
     };
 
     //send invoice info to midtrans
-    let response = await snap.createTransaction(parameter);
+    // let response = await snap.createTransactionToken(parameter);
+    let response = await axios({
+      url: "https://app.sandbox.midtrans.com/snap/v1/transactions",
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization:
+          "Basic " +
+          Buffer.from(config.midtrans.serverKey).toString("base64")
+      },
+      data: parameter
+    });
     //send resp to client
-    return res.json(response);
+    console.log(response.data);
+    return res.json(response.data);
   } catch (error) {
     console.log(error);
     return res.json({
